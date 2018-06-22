@@ -1,0 +1,36 @@
+version: '2'
+services:
+    rabbit:
+        hostname: rabbit
+        image: rabbitmq:latest
+        environment:
+            - RABBITMQ_DEFAULT_USER=admin
+            - RABBITMQ_DEFAULT_PASS=mypass
+        ports:
+            - "5672:5672"
+    redis:
+        image: redis:latest
+        volumes:
+            - ./db:/db
+        ports:
+            - "6379:6379"
+    worker:
+        build:
+            context: .
+            dockerfile: dockerfile
+        environment:
+            - CELERY_BROKER_URL=redis://redis
+        links:
+            - redis
+        depends_on:
+            - redis
+    client:
+        build:
+            context: .
+            dockerfile: dockerfile-client
+        environment:
+            - CELERY_BROKER_URL=redis://redis
+        links:
+            - redis
+        depends_on:
+            - redis

@@ -1,0 +1,6 @@
+FROM celery
+WORKDIR /app
+RUN pip install redis
+COPY client.py /app/
+COPY start.py /app/
+ENTRYPOINT [ "python","client.py"]
